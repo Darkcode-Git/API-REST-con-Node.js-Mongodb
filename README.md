@@ -201,6 +201,6 @@ DELETE
 ---
  Autor
  
-Juan Felipe Parra palacios
+Juan Felipe Parra Palacios
 
 Institución Universitaria Digital de Antioquia
