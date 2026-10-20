@@ -1,7 +1,6 @@
 # API REST - Gestión de Películas y Series
 
 ## Descripción
-
 API REST desarrollada con Node.js, Express y MongoDB para la gestión de:
 
 - Géneros
@@ -200,9 +199,6 @@ DELETE
 ```
 
 ---
-
-## Autor
-
+ Autor
 Juan Felipe Parra palacios
-
 Institución Universitaria Digital de Antioquia
