@@ -11,7 +11,7 @@ app.use("/api", rateLimit({
   limit: 100,
   standardHeaders: "draft-8",
   legacyHeaders: false,
-  message: { mensaje: "Demasiadas solicitudes, intenta nuevamente más tarde" }
+  message: { mensaje: "Desarrollo API REST utilizando JavaScript del lado del servidor con NodeJs." }
 }));
 
 app.use("/api/generos", require("./routes/generoRoutes"));
