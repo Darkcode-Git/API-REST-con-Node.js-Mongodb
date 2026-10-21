@@ -10,10 +10,10 @@ const {
  eliminarGenero
 } = require("../controllers/generoController");
 
-router.post("/",crearGenero);
-router.get("/",obtenerGeneros);
-router.get("/:id",obtenerGenero);
-router.put("/:id",actualizarGenero);
-router.delete("/:id",eliminarGenero);
+router.post("/", crearGenero);
+router.get("/", obtenerGeneros);
+router.get("/:id", obtenerGenero);
+router.put("/:id", actualizarGenero);
+router.delete("/:id", eliminarGenero);
 
 module.exports = router;
