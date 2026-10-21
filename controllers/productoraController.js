@@ -1,18 +1,12 @@
 const Productora = require("../models/Productora");
+const { crearHandler, actualizarHandler } = require("./entidadController");
 
-// Crear
-exports.crearProductora = async (req, res) => {
-  try {
-    const productora = await Productora.create(req.body);
+const camposProductora = ["nombre", "slogan", "descripcion", "estado"];
 
-    res.status(201).json({
-      mensaje: "Productora creada correctamente",
-      productora,
-    });
-  } catch (error) {
-    res.status(500).json(error);
-  }
-};
+exports.crearProductora = crearHandler(Productora, camposProductora, (productora) => ({
+  mensaje: "Productora creada correctamente",
+  productora
+}));
 
 // Obtener todas
 exports.obtenerProductoras = async (req, res) => {
@@ -42,20 +36,7 @@ exports.obtenerProductora = async (req, res) => {
   }
 };
 
-// Actualizar
-exports.actualizarProductora = async (req, res) => {
-  try {
-    const productora = await Productora.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-
-    res.status(200).json(productora);
-  } catch (error) {
-    res.status(500).json(error);
-  }
-};
+exports.actualizarProductora = actualizarHandler(Productora, camposProductora, "Productora no encontrada");
 
 // Eliminar
 exports.eliminarProductora = async (req, res) => {

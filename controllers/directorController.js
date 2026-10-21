@@ -1,18 +1,12 @@
 const Director = require("../models/Director");
+const { crearHandler, actualizarHandler } = require("./entidadController");
 
-// Crear director
-exports.crearDirector = async (req, res) => {
-  try {
-    const director = await Director.create(req.body);
+const camposDirector = ["nombres", "estado"];
 
-    res.status(201).json({
-      mensaje: "Director creado correctamente",
-      director,
-    });
-  } catch (error) {
-    res.status(500).json(error);
-  }
-};
+exports.crearDirector = crearHandler(Director, camposDirector, (director) => ({
+  mensaje: "Director creado correctamente",
+  director
+}));
 
 // Obtener todos
 exports.obtenerDirectores = async (req, res) => {
@@ -42,20 +36,7 @@ exports.obtenerDirector = async (req, res) => {
   }
 };
 
-// Actualizar
-exports.actualizarDirector = async (req, res) => {
-  try {
-    const director = await Director.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-
-    res.status(200).json(director);
-  } catch (error) {
-    res.status(500).json(error);
-  }
-};
+exports.actualizarDirector = actualizarHandler(Director, camposDirector, "Director no encontrado");
 
 // Eliminar
 exports.eliminarDirector = async (req, res) => {

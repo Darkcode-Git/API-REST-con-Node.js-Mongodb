@@ -3,6 +3,7 @@ const Genero = require("../models/Genero");
 const Director = require("../models/Director");
 const Productora = require("../models/Productora");
 const Tipo = require("../models/Tipo");
+const { validarCuerpo } = require("./entidadController");
 
 const referencias = {
   genero: { modelo: Genero, nombre: "género", requiereActivo: true },
@@ -84,6 +85,7 @@ const poblarReferencias = (consulta) => consulta
 
 exports.crearMedia = async (req, res) => {
   try {
+    validarCuerpo(req.body);
     const media = new Media(req.body);
     await validarUnicidad(media);
     await validarReferencias(media);
@@ -115,6 +117,7 @@ exports.obtenerMediaId = async (req, res) => {
 
 exports.actualizarMedia = async (req, res) => {
   try {
+    validarCuerpo(req.body);
     const media = await Media.findById(req.params.id);
     if (!media) return res.status(404).json({ mensaje: "Media no encontrada" });
 

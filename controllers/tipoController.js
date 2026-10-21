@@ -1,18 +1,12 @@
 const Tipo = require("../models/Tipo");
+const { crearHandler, actualizarHandler } = require("./entidadController");
 
-// Crear
-exports.crearTipo = async (req, res) => {
-  try {
-    const tipo = await Tipo.create(req.body);
+const camposTipo = ["nombre", "descripcion"];
 
-    res.status(201).json({
-      mensaje: "Tipo creado correctamente",
-      tipo,
-    });
-  } catch (error) {
-    res.status(500).json(error);
-  }
-};
+exports.crearTipo = crearHandler(Tipo, camposTipo, (tipo) => ({
+  mensaje: "Tipo creado correctamente",
+  tipo
+}));
 
 // Obtener todos
 exports.obtenerTipos = async (req, res) => {
@@ -42,20 +36,7 @@ exports.obtenerTipo = async (req, res) => {
   }
 };
 
-// Actualizar
-exports.actualizarTipo = async (req, res) => {
-  try {
-    const tipo = await Tipo.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-
-    res.status(200).json(tipo);
-  } catch (error) {
-    res.status(500).json(error);
-  }
-};
+exports.actualizarTipo = actualizarHandler(Tipo, camposTipo, "Tipo no encontrado");
 
 // Eliminar
 exports.eliminarTipo = async (req, res) => {
