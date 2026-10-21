@@ -58,6 +58,33 @@ npm run dev
 
 ---
 
+## Modelos y reglas de datos
+
+- Géneros, directores y productoras usan `estado: "Activo"` o `"Inactivo"`; por defecto se crean activos.
+- Todos los modelos generan `fechaCreacion` y `fechaActualizacion` automáticamente.
+- Las producciones usan `serial`, `titulo`, `url`, `imagenPortada`, `anoEstreno` y referencias obligatorias a `genero`, `director`, `productora` y `tipo`.
+- `serial` y `url` son únicos. Al crear o actualizar una producción, el género, director y productora referenciados deben existir y estar activos; el tipo debe existir.
+- Las consultas de medios incluyen los documentos relacionados de género, director, productora y tipo.
+
+Ejemplo de cuerpo para `POST /api/media`:
+
+```json
+{
+  "serial": "PEL-001",
+  "titulo": "Título de ejemplo",
+  "sinopsis": "Sinopsis de la producción",
+  "url": "https://ejemplo.com/titulo",
+  "imagenPortada": "https://ejemplo.com/portada.jpg",
+  "anoEstreno": 2024,
+  "genero": "ID_GENERO",
+  "director": "ID_DIRECTOR",
+  "productora": "ID_PRODUCTORA",
+  "tipo": "ID_TIPO"
+}
+```
+
+---
+
 ## Endpoints
 
 ### Género
