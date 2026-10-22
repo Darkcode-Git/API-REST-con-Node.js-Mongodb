@@ -15,6 +15,7 @@ app.use("/api", rateLimit({
 }));
 
 app.use("/api/generos", require("./routes/generoRoutes"));
+app.use("/api/genero", require("./routes/generoRoutes"));
 app.use("/api/directores", require("./routes/directorRoutes"));
 app.use("/api/productoras", require("./routes/productoraRoutes"));
 app.use("/api/tipos", require("./routes/tipoRoutes"));
