@@ -95,6 +95,12 @@ GET
 /api/generos
 ```
 
+También disponible en singular:
+
+```http
+GET /api/genero
+```
+
 POST
 
 ```http
