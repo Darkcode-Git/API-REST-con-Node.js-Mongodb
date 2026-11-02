@@ -237,3 +237,13 @@ DELETE
 Juan Felipe Parra Palacios
 
 Institución Universitaria Digital de Antioquia
+
+## Aplicación React
+
+La interfaz web se encuentra en `client/` y permite consultar, crear, editar y eliminar géneros, directores, productoras, tipos y películas/series.
+
+1. Inicia la API desde la raíz con `npm install` y `npm run dev`.
+2. En otra terminal, entra a `client/`, instala dependencias con `npm install` y ejecuta `npm run dev`.
+3. Abre la dirección local indicada por Vite. La interfaz se conecta por defecto a `http://localhost:3000/api`.
+
+Para usar otra dirección de API, crea `client/.env` a partir de `client/.env.example` y configura `VITE_API_URL`. La API debe permitir solicitudes CORS desde el origen donde se ejecuta la interfaz.
