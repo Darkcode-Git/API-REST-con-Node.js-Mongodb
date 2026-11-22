@@ -246,4 +246,17 @@ La interfaz web se encuentra en `client/` y permite consultar, crear, editar y e
 2. En otra terminal, entra a `client/`, instala dependencias con `npm install` y ejecuta `npm run dev`.
 3. Abre la dirección local indicada por Vite. La interfaz se conecta por defecto a `http://localhost:3000/api`.
 
-Para usar otra dirección de API, crea `client/.env` a partir de `client/.env.example` y configura `VITE_API_URL`. La API debe permitir solicitudes CORS desde el origen donde se ejecuta la interfaz.
+Para usar otra dirección de API, configura `VITE_API_URL` en un archivo `client/.env`. Incluye `/api` al final de la URL. La API debe permitir solicitudes CORS desde el origen donde se ejecuta la interfaz.
+
+## Despliegue en Render
+
+El archivo `render.yaml` configura un servicio web para la API y un sitio estático para React. Se necesita una cuenta de Render y una base de datos MongoDB accesible desde Render, por ejemplo MongoDB Atlas.
+
+1. Crea la base de datos y un usuario con permisos sobre ella. Configura el acceso de red de Atlas para las conexiones salientes de Render y copia la cadena de conexión. Las direcciones salientes pueden cambiar; si permites `0.0.0.0/0`, usa credenciales robustas y permisos mínimos.
+2. En Render, crea un **Blueprint** conectado a este repositorio y selecciona `render.yaml`. Introduce `MONGO_URI` como variable secreta de la API. No incluyas credenciales en el repositorio.
+3. Configura `VITE_API_URL` en el sitio estático con la URL HTTPS pública de la API seguida de `/api`, por ejemplo `https://tu-api.onrender.com/api`. Si la URL definitiva todavía no está disponible al crear el Blueprint, actualiza la variable cuando la API esté creada y vuelve a desplegar el frontend: Vite incorpora esta variable durante la compilación.
+4. Espera a que ambos servicios terminen de desplegarse. Abre el sitio estático y crea o actualiza un género, director, productora y tipo. Después crea y actualiza una película o serie usando esos registros. Comprueba que los cambios sigan presentes al recargar la página.
+
+Render proporciona `PORT`; no se debe configurar manualmente. `TRUST_PROXY=1` se usa para identificar clientes detrás del proxy de Render y aplicar el límite de solicitudes. La configuración de red y la conexión a MongoDB deben verificarse si la API no inicia.
+
+**Seguridad:** esta aplicación no tiene autenticación ni autorización y la API permite CORS desde cualquier origen. Cualquier persona que alcance la API puede consultar, crear, modificar o eliminar datos. Úsala solo con datos de prueba hasta implementar controles de acceso adecuados.
