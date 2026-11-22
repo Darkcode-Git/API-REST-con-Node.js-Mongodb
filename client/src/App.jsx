@@ -2,9 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 
+const configuredApiUrl = import.meta.env.VITE_API_URL?.trim()?.replace(/\/+$/, "");
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
+  baseURL: configuredApiUrl || "http://localhost:3000/api",
   headers: { "Content-Type": "application/json" },
+  timeout: 15000,
 });
 
 const modules = {
@@ -114,6 +117,10 @@ const cellValue = (record, field) =>
     : record[field] || "—";
 
 function errorMessage(error) {
+  const status = error.response?.status;
+  if (status === 502 || status === 503 || status === 504 || !error.response) {
+    return "La API no está disponible en este momento. Es posible que el servicio esté iniciando o que haya un problema temporal de conexión.";
+  }
   return error.response?.data?.mensaje
     || error.response?.data?.message
     || error.response?.data?.error
@@ -127,6 +134,7 @@ function App() {
   const [catalogs, setCatalogs] = useState(emptyCatalogs);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState("");
+  const [apiStatus, setApiStatus] = useState("loading");
   const [search, setSearch] = useState("");
   const [formRecord, setFormRecord] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -136,15 +144,18 @@ function App() {
   const loadRecords = useCallback(async () => {
     setLoading(true);
     setLoadError("");
+    setApiStatus("loading");
     try {
       const { data } = await api.get(config.endpoint);
       if (!Array.isArray(data)) {
         throw new Error("La API devolvió una respuesta inesperada.");
       }
       setRecords(data);
+      setApiStatus("online");
     } catch (error) {
       setRecords([]);
       setLoadError(errorMessage(error));
+      setApiStatus("offline");
     } finally {
       setLoading(false);
     }
@@ -154,9 +165,12 @@ function App() {
     try {
       const keys = Object.keys(emptyCatalogs);
       const responses = await Promise.all(keys.map((key) => api.get(modules[key].endpoint)));
-      setCatalogs(Object.fromEntries(keys.map((key, index) => [key, responses[index].data])));
+      const nextCatalogs = Object.fromEntries(keys.map((key, index) => [key, responses[index].data]));
+      setCatalogs(nextCatalogs);
+      setApiStatus("online");
     } catch (error) {
       setLoadError(`No se pudieron cargar los catálogos: ${errorMessage(error)}`);
+      setApiStatus("offline");
     }
   }, []);
 
@@ -307,8 +321,8 @@ function App() {
           ))}
         </nav>
         <div className="sidebar-footer">
-          <span className="connection-dot" />
-          API REST
+          <span className={`connection-dot ${apiStatus === "offline" ? "connection-offline" : apiStatus === "loading" ? "connection-loading" : ""}`} />
+          {apiStatus === "offline" ? "API fuera de línea" : apiStatus === "loading" ? "Conectando..." : "API REST"}
           <span className="sidebar-version">v1.0</span>
         </div>
       </aside>
@@ -338,7 +352,10 @@ function App() {
             <div className="summary-icon">{navigation.find((item) => item.key === selected)?.mark}</div>
             <div><strong>{records.length}</strong><span>registros en {config.label.toLocaleLowerCase("es")}</span></div>
             <div className="summary-divider" />
-            <span className="summary-note"><span className="connection-dot" /> Sincronizado con la API</span>
+            <span className="summary-note">
+              <span className={`connection-dot ${apiStatus === "offline" ? "connection-offline" : apiStatus === "loading" ? "connection-loading" : ""}`} />
+              {apiStatus === "offline" ? "API no disponible" : apiStatus === "loading" ? "Verificando conexión" : "Sincronizado con la API"}
+            </span>
           </div>
 
           <section className="data-card">
@@ -355,9 +372,20 @@ function App() {
               </label>
             </div>
             {loadError && (
-              <div className="alert alert-danger mx-4 mb-0" role="alert">
-                {loadError} Comprueba que la API esté activa y que VITE_API_URL sea correcto.
-                <button className="btn btn-sm btn-outline-danger ms-3" onClick={loadRecords} type="button">Reintentar</button>
+              <div className="api-error-banner" role="alert">
+                <div className="api-error-icon" aria-hidden="true">!</div>
+                <div className="api-error-copy">
+                  <strong>No podemos conectar con el servidor</strong>
+                  <span>{loadError}</span>
+                  <small>
+                    Espera unos minutos si el servicio de Render está iniciando.
+                    {!configuredApiUrl && " Configura VITE_API_URL con la URL pública de la API seguida de /api."}
+                  </small>
+                </div>
+                <button className="retry-button" onClick={() => {
+                  loadRecords();
+                  if (selected === "media") loadCatalogs();
+                }} type="button">Reintentar</button>
               </div>
             )}
             <div className="table-responsive">
