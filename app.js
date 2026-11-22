@@ -10,6 +10,11 @@ if (process.env.TRUST_PROXY === "1") {
 
 app.use(cors());
 app.use(express.json());
+
+app.get("/health", (req, res) => {
+  res.status(200).json({ estado: "ok" });
+});
+
 app.use("/api", rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 100,
