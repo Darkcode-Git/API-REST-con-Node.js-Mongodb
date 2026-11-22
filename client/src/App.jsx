@@ -274,9 +274,10 @@ function App() {
     if (field.type === "status") {
       return ["Activo", "Inactivo"].map((value) => ({ value, label: value }));
     }
-    const options = catalogs[field.name] || [];
+    const catalogKeys = { genero: "generos", director: "directores", productora: "productoras", tipo: "tipos" };
+    const options = catalogs[catalogKeys[field.name]] || [];
     return options
-      .filter((option) => option.estado === "Activo" || recordId(option) === formRecord[field.name])
+      .filter((option) => !option.estado || option.estado === "Activo" || recordId(option) === formRecord[field.name])
       .map((option) => ({
         value: recordId(option),
         label: option.nombre || option.nombres,
