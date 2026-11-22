@@ -3,6 +3,7 @@ const Genero = require("../models/Genero");
 const Director = require("../models/Director");
 const Productora = require("../models/Productora");
 const Tipo = require("../models/Tipo");
+const mongoose = require("mongoose");
 
 const referencias = {
   genero: { modelo: Genero, nombre: "género", requiereActivo: true },
@@ -105,7 +106,11 @@ exports.obtenerMedia = async (req, res) => {
 
 exports.obtenerMediaId = async (req, res) => {
   try {
-    const media = await poblarReferencias(Media.findById(req.params.id));
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ mensaje: "El identificador indicado no es válido" });
+    }
+    const id = new mongoose.Types.ObjectId(req.params.id);
+    const media = await poblarReferencias(Media.findById(id));
     if (!media) return res.status(404).json({ mensaje: "Media no encontrada" });
     res.json(media);
   } catch (error) {
@@ -115,7 +120,11 @@ exports.obtenerMediaId = async (req, res) => {
 
 exports.actualizarMedia = async (req, res) => {
   try {
-    const media = await Media.findById(req.params.id);
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ mensaje: "El identificador indicado no es válido" });
+    }
+    const id = new mongoose.Types.ObjectId(req.params.id);
+    const media = await Media.findById(id);
     if (!media) return res.status(404).json({ mensaje: "Media no encontrada" });
 
     for (const campo of camposEditables) {
@@ -135,7 +144,11 @@ exports.actualizarMedia = async (req, res) => {
 
 exports.eliminarMedia = async (req, res) => {
   try {
-    const media = await Media.findByIdAndDelete(req.params.id);
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ mensaje: "El identificador indicado no es válido" });
+    }
+    const id = new mongoose.Types.ObjectId(req.params.id);
+    const media = await Media.findByIdAndDelete(id);
     if (!media) return res.status(404).json({ mensaje: "Media no encontrada" });
     res.json({ mensaje: "Media eliminada" });
   } catch (error) {

@@ -1,4 +1,5 @@
 const Productora = require("../models/Productora");
+const { responderError, validarId } = require("./crudUtils");
 
 // Crear
 exports.crearProductora = async (req, res) => {
@@ -10,7 +11,7 @@ exports.crearProductora = async (req, res) => {
       productora,
     });
   } catch (error) {
-    res.status(500).json(error);
+    responderError(res,error);
   }
 };
 
@@ -21,14 +22,16 @@ exports.obtenerProductoras = async (req, res) => {
 
     res.status(200).json(productoras);
   } catch (error) {
-    res.status(500).json(error);
+    responderError(res,error);
   }
 };
 
 // Obtener por ID
 exports.obtenerProductora = async (req, res) => {
   try {
-    const productora = await Productora.findById(req.params.id);
+    const id = validarId(res, req.params.id);
+    if (!id) return;
+    const productora = await Productora.findById(id);
 
     if (!productora) {
       return res.status(404).json({
@@ -38,34 +41,45 @@ exports.obtenerProductora = async (req, res) => {
 
     res.status(200).json(productora);
   } catch (error) {
-    res.status(500).json(error);
+    responderError(res,error);
   }
 };
 
 // Actualizar
 exports.actualizarProductora = async (req, res) => {
   try {
-    const productora = await Productora.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    const id = validarId(res, req.params.id);
+    if (!id) return;
+    const productora = await Productora.findById(id);
 
+    if (!productora) {
+      return res.status(404).json({ mensaje: "Productora no encontrada" });
+    }
+    for (const campo of ["nombre", "slogan", "descripcion", "estado"]) {
+      if (Object.prototype.hasOwnProperty.call(req.body, campo)) productora[campo] = req.body[campo];
+    }
+    await productora.save();
     res.status(200).json(productora);
   } catch (error) {
-    res.status(500).json(error);
+    responderError(res,error);
   }
 };
 
 // Eliminar
 exports.eliminarProductora = async (req, res) => {
   try {
-    await Productora.findByIdAndDelete(req.params.id);
+    const id = validarId(res, req.params.id);
+    if (!id) return;
+    const productora = await Productora.findByIdAndDelete(id);
+
+    if (!productora) {
+      return res.status(404).json({ mensaje: "Productora no encontrada" });
+    }
 
     res.status(200).json({
       mensaje: "Productora eliminada correctamente",
     });
   } catch (error) {
-    res.status(500).json(error);
+    responderError(res,error);
   }
 };

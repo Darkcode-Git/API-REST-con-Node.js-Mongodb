@@ -1,38 +1,60 @@
 const Genero = require("../models/Genero");
+const { responderError, validarId } = require("./crudUtils");
 
 exports.crearGenero = async(req,res)=>{
     try{
         const genero = await Genero.create(req.body);
         res.status(201).json(genero);
     }catch(error){
-        res.status(500).json(error);
+        responderError(res,error);
     }
 };
 
 exports.obtenerGeneros = async(req,res)=>{
-    const generos = await Genero.find();
-    res.json(generos);
+    try {
+        const generos = await Genero.find();
+        res.status(200).json(generos);
+    } catch (error) {
+        responderError(res,error);
+    }
 };
 
 exports.obtenerGenero = async(req,res)=>{
-    const genero = await Genero.findById(req.params.id);
-    res.json(genero);
+    try {
+        const id = validarId(res, req.params.id);
+        if (!id) return;
+        const genero = await Genero.findById(id);
+        if (!genero) return res.status(404).json({mensaje:"Genero no encontrado"});
+        res.status(200).json(genero);
+    } catch (error) {
+        responderError(res,error);
+    }
 };
 
 exports.actualizarGenero = async(req,res)=>{
-    const genero = await Genero.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {new:true}
-    );
-
-    res.json(genero);
+    try {
+        const id = validarId(res, req.params.id);
+        if (!id) return;
+        const genero = await Genero.findById(id);
+        if (!genero) return res.status(404).json({mensaje:"Genero no encontrado"});
+        for (const campo of ["nombre","descripcion","estado"]) {
+          if (Object.prototype.hasOwnProperty.call(req.body,campo)) genero[campo] = req.body[campo];
+        }
+        await genero.save();
+        res.status(200).json(genero);
+    } catch (error) {
+        responderError(res,error);
+    }
 };
 
 exports.eliminarGenero = async(req,res)=>{
-    await Genero.findByIdAndDelete(req.params.id);
-
-    res.json({
-      mensaje:"Genero eliminado"
-    });
+    try {
+        const id = validarId(res, req.params.id);
+        if (!id) return;
+        const genero = await Genero.findByIdAndDelete(id);
+        if (!genero) return res.status(404).json({mensaje:"Genero no encontrado"});
+        res.status(200).json({mensaje:"Genero eliminado"});
+    } catch (error) {
+        responderError(res,error);
+    }
 };

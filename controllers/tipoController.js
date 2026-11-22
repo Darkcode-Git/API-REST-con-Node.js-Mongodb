@@ -1,4 +1,5 @@
 const Tipo = require("../models/Tipo");
+const { responderError, validarId } = require("./crudUtils");
 
 // Crear
 exports.crearTipo = async (req, res) => {
@@ -10,7 +11,7 @@ exports.crearTipo = async (req, res) => {
       tipo,
     });
   } catch (error) {
-    res.status(500).json(error);
+    responderError(res,error);
   }
 };
 
@@ -21,14 +22,16 @@ exports.obtenerTipos = async (req, res) => {
 
     res.status(200).json(tipos);
   } catch (error) {
-    res.status(500).json(error);
+    responderError(res,error);
   }
 };
 
 // Obtener por ID
 exports.obtenerTipo = async (req, res) => {
   try {
-    const tipo = await Tipo.findById(req.params.id);
+    const id = validarId(res, req.params.id);
+    if (!id) return;
+    const tipo = await Tipo.findById(id);
 
     if (!tipo) {
       return res.status(404).json({
@@ -38,34 +41,45 @@ exports.obtenerTipo = async (req, res) => {
 
     res.status(200).json(tipo);
   } catch (error) {
-    res.status(500).json(error);
+    responderError(res,error);
   }
 };
 
 // Actualizar
 exports.actualizarTipo = async (req, res) => {
   try {
-    const tipo = await Tipo.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    const id = validarId(res, req.params.id);
+    if (!id) return;
+    const tipo = await Tipo.findById(id);
 
+    if (!tipo) {
+      return res.status(404).json({ mensaje: "Tipo no encontrado" });
+    }
+    for (const campo of ["nombre", "descripcion"]) {
+      if (Object.prototype.hasOwnProperty.call(req.body, campo)) tipo[campo] = req.body[campo];
+    }
+    await tipo.save();
     res.status(200).json(tipo);
   } catch (error) {
-    res.status(500).json(error);
+    responderError(res,error);
   }
 };
 
 // Eliminar
 exports.eliminarTipo = async (req, res) => {
   try {
-    await Tipo.findByIdAndDelete(req.params.id);
+    const id = validarId(res, req.params.id);
+    if (!id) return;
+    const tipo = await Tipo.findByIdAndDelete(id);
+
+    if (!tipo) {
+      return res.status(404).json({ mensaje: "Tipo no encontrado" });
+    }
 
     res.status(200).json({
       mensaje: "Tipo eliminado correctamente",
     });
   } catch (error) {
-    res.status(500).json(error);
+    responderError(res,error);
   }
 };
