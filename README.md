@@ -259,4 +259,6 @@ El archivo `render.yaml` configura un servicio web para la API y un sitio estát
 
 Render proporciona `PORT`; no se debe configurar manualmente. `TRUST_PROXY=1` se usa para identificar clientes detrás del proxy de Render y aplicar el límite de solicitudes. La configuración de red y la conexión a MongoDB deben verificarse si la API no inicia.
 
+La API valida `MONGO_URI` antes de abrir el puerto y expone `GET /health` para comprobar que el servicio está disponible. El script de producción es `npm start`; durante el despliegue Render ejecuta `npm ci` y luego `npm start`.
+
 **Seguridad:** esta aplicación no tiene autenticación ni autorización y la API permite CORS desde cualquier origen. Cualquier persona que alcance la API puede consultar, crear, modificar o eliminar datos. Úsala solo con datos de prueba hasta implementar controles de acceso adecuados.
