@@ -18,6 +18,13 @@ app.use("/api", rateLimit({
   message: { mensaje: "Desarrollo API REST utilizando JavaScript del lado del servidor con NodeJs." }
 }));
 
+app.get("/", (req, res) => {
+  res.json({
+    mensaje: "API de películas en funcionamiento",
+    endpoints: ["/api/generos", "/api/directores", "/api/productoras", "/api/tipos", "/api/media"]
+  });
+});
+
 app.use("/api/generos", require("./routes/generoRoutes"));
 app.use("/api/genero", require("./routes/generoRoutes"));
 app.use("/api/directores", require("./routes/directorRoutes"));
