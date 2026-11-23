@@ -8,7 +8,18 @@ if (process.env.TRUST_PROXY === "1") {
   app.set("trust proxy", 1);
 }
 
-app.use(cors());
+  const corsOrigins = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(",").map((origin) => origin.trim()).filter(Boolean)
+    : ["*"];
+
+  app.use(cors({
+    origin(origin, callback) {
+      if (!origin || corsOrigins.includes("*") || corsOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Origen no permitido por CORS"));
+    }
+  }));
 app.use(express.json());
 app.use("/api", rateLimit({
   windowMs: 15 * 60 * 1000,
