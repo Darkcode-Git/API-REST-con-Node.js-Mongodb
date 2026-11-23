@@ -23,7 +23,11 @@ const MediaSchema = new mongoose.Schema({
     type:String,
     trim:true
   },
-  anoEstreno:Number,
+  anoEstreno:{
+    type:Number,
+    min:1888,
+    max:new Date().getFullYear() + 5
+  },
   genero:{
     type:mongoose.Schema.Types.ObjectId,
     ref:"Genero",

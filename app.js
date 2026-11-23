@@ -32,4 +32,17 @@ app.use("/api/productoras", require("./routes/productoraRoutes"));
 app.use("/api/tipos", require("./routes/tipoRoutes"));
 app.use("/api/media", require("./routes/mediaRoutes"));
 
+app.use((req, res) => {
+  res.status(404).json({ mensaje: "Ruta no encontrada" });
+});
+
+app.use((error, req, res, next) => {
+  if (error instanceof SyntaxError && error.status === 400 && "body" in error) {
+    return res.status(400).json({ mensaje: "El cuerpo JSON no es válido" });
+  }
+  return res.status(error.statusCode || 500).json({
+    mensaje: error.statusCode ? error.message : "Error interno del servidor",
+  });
+});
+
 module.exports = app;
